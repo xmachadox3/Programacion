@@ -13,12 +13,14 @@
 
 	void morse(char morse[]);
 	void menu();
+	void limpiar_cadena(char morse[],int k);
 	
 
 	int main(){
-		 char cadena[50];
-		 char op='s';
-		 do{
+		char cadena[50];
+		char op='s';
+		do{
+			limpiar_cadena(cadena,50);
 			limpiar;
 			menu();
 			printf("Ingresa una Frase: ");
@@ -89,7 +91,13 @@
 		printf("\t|Y -.--  |  Z --.. |  1.---- |  2..--- |\n");
 		printf("\t________________________________________\n");
 	}
-	     
+	
+	void limpiar_cadena(char morse[],int k){
+		int i = 0;
+			for(i = 0; i < k; i++){
+				morse[i] = ' ';
+			}
+	}
                              
       
         
