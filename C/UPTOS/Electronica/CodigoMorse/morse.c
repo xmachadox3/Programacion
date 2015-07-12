@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+
 #ifdef _WIN32
 	#define limpiar system("cls");
 	#ifdef _WIN64
@@ -65,7 +67,7 @@
 		for(k=0;k< (sizeof(palabra) / sizeof(palabra[0]));k++){
 			for (i=0;i<28;i++){
 				for(j=1;j<6;j++){
-						if(palabra[k] == M[i][0]){
+						if(tolower(palabra[k]) == M[i][0]){
 								printf("%c",M[i][j]);
 						}
 				}
