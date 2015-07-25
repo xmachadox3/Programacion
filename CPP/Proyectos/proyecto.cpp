@@ -71,7 +71,17 @@
 			Pasajero operator=(const Pasajero &P);		
 			bool ccedula(char const c[10]){return strcmp(this->cedula,c);};
 			Pasajero();
-	};
+			bool operator >(const Pasajero &P);
+			bool operator <(const Pasajero &P);
+			
+	};	
+	
+	bool Pasajero::operator > (const Pasajero &P){
+		return atoi(this->cedula) > atoi(P.cedula);
+	}
+	bool Pasajero::operator < (const Pasajero &P){
+		return atoi(this->cedula) < atoi(P.cedula);
+	}
 	
 	Pasajero::Pasajero(){
 		strcpy(nombre,"");
@@ -79,6 +89,7 @@
 		strcpy(cedula,"");
 		strcpy(telefono,"");
 	}
+	
 	Pasajero Pasajero::operator =(const Pasajero &P){
 		strcpy(this->nombre,P.nombre);
 		strcpy(this->apellido,P.apellido);
@@ -120,20 +131,22 @@
 			void cerrar();
 			void imprimir(int clase, int tipo, int nrovuelo,char nombrerutas[3][25], char horasalida[3][20][8], char horallegada[3][20][8], Pasajero P);
 			friend class Menu;
-			void ordenar(Pasajero P[20]);
+			void ordenar(Pasajero P[20],int num);
 	};
 	
-	void Vuelo::ordenar(Pasajero P[20]){
+	void Vuelo::ordenar(Pasajero P[20],int num){
 		int i, j, flag = 1;   
 		Pasajero temp;            
-		int numLength = 20; 
-		for(i = 1; (i <= numLength) && flag; i++)
+		
+		for(i = 1; (i <= num) && flag; i++)
 		{
 			flag = 0;
-			for (j=0; j < (numLength -1); j++)
+			for (j=0; j < (num -1); j++)
 			{
-				if (P[j+1] > P[j])      
+				
+				if (P[j+1] < P[j])      //Cambiar, para ordenar desc, ascd
 				{ 
+					cout<<1<<endl;
 					temp = P[j];             
                     P[j] = P[j+1];
                     P[j+1] = temp;
@@ -155,11 +168,14 @@
 		int cont = 0;
 		for(int i = 0; i < 20; i ++){
 			if(confirmados[ruta-1][i]){
-				listapasajeros[i] = pasajeros[ruta-1][i];				
+				listapasajeros[cont] = pasajeros[ruta-1][i];				
 				cont++;
 			}
 		}
-		ordenar(listapasajeros);
+		ordenar(listapasajeros,cont);
+		for(int i = 0 ; i < cont; i++){
+			cout<<listapasajeros[i]<<endl;
+		}
 			
 			
 	}
@@ -226,9 +242,10 @@
 			if(!flags) cout<<"No hay puestos vacios, espere que alquien no confirme"<<endl;
 			else{
 				cin>>ex;
+				clase = ex-1;
 				if(clase < 10){
-					if(ex > 0 && ex < 10 && !rutas[tipo][ex-1]){
-						rutas[tipo][ex-1] = true;
+					if(clase > 0 && clase < 10 && !rutas[tipo][clase]){
+						rutas[tipo][clase] = true;
 						pasajeros[tipo][clase] = P;	
 					} 
 					else{
@@ -236,7 +253,7 @@
 					}
 				}
 				else{
-					clase = ex-1;
+					
 					if(clase > 10 && clase < 20 && !rutas[tipo][clase]){
 						rutas[tipo][clase] = true;
 						pasajeros[tipo][clase] = P;							
