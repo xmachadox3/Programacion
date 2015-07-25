@@ -27,34 +27,29 @@
 	
 	int Menu::menu1(){
 		cout<<"---- Proyecto (RESERVACIONES) ---- "<<endl;
-		cout<<"1 - Procesar  Vuelo"<<endl;
-		cout<<"2 - Confirmar Vuelo"<<endl;
+		cout<<"1 - Procesar  Boleto"<<endl;
+		cout<<"2 - Confirmar Boleto"<<endl;
 		cout<<"3 - Cerrar Vuelo"<<endl;
-		cout<<"4 - Cancelar Vuelo Pasajero"<<endl;
+		cout<<"4 - Cancelar Boleto Pasajero"<<endl;
 		cout<<"5 - Funciones de Mantenimiento"<<endl;
 		cin>>opc1;
 		return opc1;
 	}
 	
 	int* Menu::menu2(char rutas[3][25]){
-		limpiar;
-		
+		limpiar;		
 		cout<<" ---- Seleccione la ruta ---- "<<endl;
 		for(int i = 0; i < 3; i++)
 		cout<<i+1<<" - "<<rutas[i]<<endl;		
 		cin>>opc1;
-		limpiar;
-		
+		limpiar;		
 		cout<<"---- Ingrese la Clase ---- "<<endl;
 		cout<<"1 - Primera Clase"<<endl;
 		cout<<"2 - Clase Economica"<<endl;
 		cin>>opc2;
 		int *x = new int[2];
 		x[0] = opc1-1;
-		x[1] = opc2-1;
-		
-		
-		
+		x[1] = opc2-1;	
 		return x;
 	}	
 	
@@ -71,12 +66,19 @@
 			char cedula[10];
 			char telefono[15];
 		public:			
-			//void modificar();	
 			friend ostream& operator << (ostream &o, const Pasajero &p);
 			friend istream& operator >> (istream &i, Pasajero &p);
 			Pasajero operator=(const Pasajero &P);		
 			bool ccedula(char const c[10]){return strcmp(this->cedula,c);};
+			Pasajero();
 	};
+	
+	Pasajero::Pasajero(){
+		strcpy(nombre,"");
+		strcpy(apellido,"");
+		strcpy(cedula,"");
+		strcpy(telefono,"");
+	}
 	Pasajero Pasajero::operator =(const Pasajero &P){
 		strcpy(this->nombre,P.nombre);
 		strcpy(this->apellido,P.apellido);
@@ -94,11 +96,11 @@
 	}
 
 	istream& operator >> (istream &i, Pasajero &p){
-			cout<<"Ingrese el nombre: "; 	i>>p.nombre;
-			cout<<"Ingrese el Apellido: "; 	i>>p.apellido;
-			cout<<"Ingrese la Cedula: "; 	i>>p.cedula;
-			cout<<"Ingrese el Telefono: "; 	i>>p.telefono;
-			return i;
+		cout<<"Ingrese el nombre: "; 	i>>p.nombre;
+		cout<<"Ingrese el Apellido: "; 	i>>p.apellido;
+		cout<<"Ingrese la Cedula: "; 	i>>p.cedula;
+		cout<<"Ingrese el Telefono: "; 	i>>p.telefono;
+		return i;
 	}
 	
 	class Vuelo{
@@ -107,17 +109,59 @@
 			Pasajero pasajeros[3][20];  	//Pasajeros
 			char	 nombrerutas[3][25];	//Nombre de las Rutas
 			bool 	 confirmados[3][20];    //Pasajeros Confirmados.
+			char 	 shora[3][20][8];
+			char     lhora[3][20][8];
+			int nroVuelo;
 		public:
 			Vuelo();
 			void asignarPasajero(Pasajero const P, Menu menu);
 			void puestos();
 			void confirmar();
 			void cerrar();
+			void imprimir(int clase, int tipo, int nrovuelo,char nombrerutas[3][25], char horasalida[3][20][8], char horallegada[3][20][8], Pasajero P);
 			friend class Menu;
+			void ordenar(Pasajero P[20]);
 	};
 	
+	void Vuelo::ordenar(Pasajero P[20]){
+		int i, j, flag = 1;   
+		Pasajero temp;            
+		int numLength = 20; 
+		for(i = 1; (i <= numLength) && flag; i++)
+		{
+			flag = 0;
+			for (j=0; j < (numLength -1); j++)
+			{
+				if (P[j+1] > P[j])      
+				{ 
+					temp = P[j];             
+                    P[j] = P[j+1];
+                    P[j+1] = temp;
+                    flag = 1;               
+				}
+			}
+		}
+	}
+	
+	
+	
 	void Vuelo::cerrar(){
-		
+		int ruta;
+		Pasajero listapasajeros[20];
+		cout<<"Seleccione la ruta a cerrar"<<endl;
+		for(int i = 0 ; i < 3; i++)
+			cout<<i+1<<" - "<<nombrerutas[i]<<endl;
+		cin>>ruta;
+		int cont = 0;
+		for(int i = 0; i < 20; i ++){
+			if(confirmados[ruta-1][i]){
+				listapasajeros[i] = pasajeros[ruta-1][i];				
+				cont++;
+			}
+		}
+		ordenar(listapasajeros);
+			
+			
 	}
 	
 	void Vuelo::confirmar(){
@@ -150,22 +194,17 @@
 		int *pos;
 		srand(time(NULL));	
 		pos = menu.menu2(nombrerutas);
-		/*
-		char shora[8];
-		char lhora[8];
-		cout<<"Ingrese Hora de Salida hh:mm:ss"<<endl;
-		cin>>shora;
-		cout<<"Ingrese Hora de Llegada hh:mm:ss"<<endl;
-		cin>>lhora;		
-		* */
-								//VIP         //NO - VIP
- 		pos[1] = pos[1] < 1 ? rand()%11 : rand()%10 + 10; // posicion
+ 		pos[1] = pos[1] < 1 ? rand()%10   : rand()%10 + 10; // posicion
 		int tipo 	= pos[0];
 		int clase 	= pos[1];
 		
 		if(rutas[tipo][clase] == false){ //Programar si no esta de acuerdo con este asiento.
 			rutas[tipo][clase] = true;
-			pasajeros[tipo][clase] = P;			
+			pasajeros[tipo][clase] = P;	
+			cout<<"Ingrese Hora de Salida hh:mm:ss"<<endl;
+			cin>>shora[tipo][clase];
+			cout<<"Ingrese Hora de Llegada hh:mm:ss"<<endl;
+			cin>>lhora[tipo][clase];				
 		}
 		else{
 			int ex;
@@ -197,9 +236,10 @@
 					}
 				}
 				else{
-					if(ex > 10 && ex < 20 && !rutas[tipo][ex-1]){
-						rutas[tipo][ex-1] = true;
-						pasajeros[tipo][clase] = P;	
+					clase = ex-1;
+					if(clase > 10 && clase < 20 && !rutas[tipo][clase]){
+						rutas[tipo][clase] = true;
+						pasajeros[tipo][clase] = P;							
 					} 
 					else{
 						cout<<"No se pudo realizar la asignacion"<<endl;	
@@ -208,10 +248,30 @@
 						
 			}
 			//Colocar la parte de irse, por que todos estan llenos
-		}	
+		}
+		limpiar;
+		imprimir(clase,tipo,++nroVuelo,nombrerutas,shora,lhora,P);	
+	}
+	
+	void Vuelo::imprimir(int clase, int tipo, int nrovuelo,char nombrerutas[3][25], char horasalida[3][20][8], char horallegada[3][20][8], Pasajero P){
+		
+		cout<<"Numero de Boleto["<<nrovuelo<<"]"<<endl;
+		cout<<"Clase: ";
+		
+		if(tipo == 0)
+			cout<<"Primera Clase \t";
+		else
+			cout<<"Clase Economica \t";
+		cout<<"Asiento: " << clase + 1<<endl;
+		cout<<"Hora de Salida: "<<horasalida[tipo][clase]<<" \t Hora de Llegada: "<<horallegada[tipo][clase]<<endl;
+		cout<<"Ruta: "<<nombrerutas[tipo]<<endl;
+		cout<<"--------------------------------------------------------"<<endl;
+		cout<<P<<endl;
+		
 	}
 	
 	Vuelo::Vuelo(){
+		nroVuelo = 0;
 		strcpy(nombrerutas[0],"Caracas  ");
 		strcpy(nombrerutas[1],"Margarita");
 		strcpy(nombrerutas[2],"Cumana   ");
@@ -237,13 +297,13 @@
 					limpiar;
 					cin>>p;
 					vuelo.asignarPasajero(p,menu);
-					vuelo.puestos();
 					break;
 				case 2:
 					limpiar;
 					vuelo.confirmar();
 					break;
 				case 3:
+					vuelo.cerrar();
 					break;
 			}
 		}while(menu.menu3()!='n');	
