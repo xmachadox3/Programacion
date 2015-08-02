@@ -73,8 +73,16 @@
 			Pasajero();
 			bool operator >(const Pasajero &P);
 			bool operator <(const Pasajero &P);
+			void clear();
 			
 	};	
+	
+	void Pasajero::clear(){
+		strcpy(nombre,"");
+		strcpy(apellido,"");
+		strcpy(cedula,"");
+		strcpy(telefono,"");
+	}
 	
 	bool Pasajero::operator > (const Pasajero &P){
 		return atoi(this->cedula) > atoi(P.cedula);
@@ -129,6 +137,7 @@
 			void puestos();
 			void confirmar();
 			void cerrar();
+			void cancelar(char cedula[10]);
 			void imprimir(int clase, int tipo, int nrovuelo,char nombrerutas[3][25], char horasalida[3][20][8], char horallegada[3][20][8], Pasajero P);
 			friend class Menu;
 			void ordenar(Pasajero P[20],int num);
@@ -301,6 +310,27 @@
 		}		
 	}
 	
+	void Vuelo::cancelar(char cedula[10]){
+		bool flags = false;
+		for(int i = 0; i < 3; i++){
+			for(int j = 0 ; j < 20; j ++){
+				if(pasajeros[i][j].ccedula(cedula)==0){
+					flags = true;
+					confirmados[i][j] = false;
+					rutas[i][j] = false;
+					pasajeros[i][j].clear();
+					cout<<"Se ha eliminado al cliente: "<<cedula<<endl;
+					cout<<"Perteneciente a la ruta: "<<nombrerutas[i]<<endl;
+					cout<<"En el asiento: "<<j<<endl;
+					strcpy(shora[i][j],"");
+					strcpy(lhora[i][j],"");
+				}
+			}
+		}
+		if(!flags) cout<<"No se encontro al pasajero"<<endl;
+		
+	}
+	
 	int main(){
 		
 		Pasajero p;
@@ -322,6 +352,11 @@
 				case 3:
 					vuelo.cerrar();
 					break;
+				case 4:
+					char cedula[10];
+					cout<<"Ingrese la cedula del pasajero a cancelar"<<endl;
+					cin>>cedula;
+					vuelo.cancelar(cedula);
 			}
 		}while(menu.menu3()!='n');	
 	}
